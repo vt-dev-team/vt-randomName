@@ -1,0 +1,42 @@
+* {
+	font-family: "等线";
+}
+
+QPushButton {
+    padding: 6px 20px;
+    background-color: #ffffff;
+    color: #606266;
+    border: 1px solid #dcdfe6;
+    border-color: #dcdfe6;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+QPushButton#bluebutton {
+    color: #fff;
+    background-color: #ec7259;
+    border-color: #ec7259;
+}
+
+QPushButton#orangebutton {
+    color: #fff;
+    background-color: #e6a23c;
+    border-color: #e6a23c;
+}
+
+QPushButton:hover {
+    color: #409eff;
+    background-color: #ecf5ff;
+}
+
+QPushButton#bluebutton:hover {
+    background: #fc8269;
+    border-color: #fc8269;
+    color: #fff;
+}
+
+QPushButton#orangebutton:hover {
+    background: #ebb563;
+    border-color: #ebb563;
+    color: #fff;
+}

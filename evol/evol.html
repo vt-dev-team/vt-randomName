@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='UTF-8'>
+	<title>evol</title>
+	<link rel='stylesheet' href='./semantic.min.css'>
+	<script src='./vue.min.js'></script>
+	<script src='./jquery.min.js'></script>
+	<script src='./semantic.min.js'></script>
+	<script src='./moment.js'></script>
+	<script src='./ijc.js'></script>
+	<style type="text/css" id="customizeStyle">
+		#app {
+			opacity: .7;
+			background-color: rgba(255, 255, 255, .7) !important;
+			backdrop-filter: blur(5px)
+		}
+
+		.mainText {
+			font-size: 70px !important;
+			font-weight: 300 !important;
+			color: #ff1493 !important
+		}
+
+		.Me {
+			color: #47af50
+		}
+	</style>
+	<style>
+		#app {
+			margin-left: 95px;
+			padding: 7px 16px
+		}
+
+		.mainTab {
+			text-align: center
+		}
+
+		.field.customizeRangeField {
+			display: none
+		}
+
+		body {
+			transition: all .5s;
+			overflow-x: hidden
+		}
+
+		::-webkit-scrollbar {
+			width: 5px
+		}
+
+		::-webkit-scrollbar-thumb {
+			border-radius: 10px;
+			-webkit-box-shadow: inset 0 0 5px #bebebe;
+			background: #bebebe;
+			transition: all .5s
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			border-radius: 10px;
+			-webkit-box-shadow: inset 0 0 5px #aaa;
+			background: #aaa
+		}
+
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 5px #e0e0e0;
+			border-radius: 0;
+			background: #e0e0e0;
+			opacity: 1
+		}
+
+		#totop {
+			position: fixed;
+			bottom: 100px;
+			right: 0;
+			z-index: 114514
+		}
+
+		.editor {
+			border-radius: 0 !important
+		}
+
+		.vmenu {
+			transition: all .2s;
+			overflow-y: auto
+		}
+
+		.vmenu:hover {
+			box-shadow: 0 5px 10px rgba(34, 36, 38, 0.3) !important
+		}
+
+		.vmenu .active.item {
+			background-color: #2185d0 !important;
+			color: #fff !important
+		}
+
+		.orzptl {
+			display: none
+		}
+
+		#code_ijcwindow {
+			position: relative;
+			border-radius: 0 !important;
+			border: 0;
+			padding: 0 !important
+		}
+	</style>
+</head>
+
+<body>
+	<div class="ui light big launch right attached fixed button" id="totop"><i class="angle up icon"></i></div>
+	<div class='ui left fixed vertical labeled icon mini borderless menu vmenu'><a class='item' data-tab='Overview'><i
+				class='icon info'></i> Overview </a><a class='active item' data-tab='Show'><i class='icon tv'></i> Show
+		</a><a class='item' data-tab='Settings'><i class='icon cog'></i> Settings </a><a class='item'
+			data-tab='Preferences'><i class='icon paint roller'></i> Preferences </a><a class="item" data-tab='Timer'><i
+				class='icon clock'></i> Time </a><a class='item' data-tab='AdvancedSettings'><i class="hammer icon"></i>
+			Advanced </a><a class='item' data-tab='Terminal'><i class="terminal icon"></i> Console </a></div>
+	<div id="app" style="margin-top: 30px">
+		<div class='ui bottom attached active tab mainTab' data-tab='Show'>
+			<h1 class="ui header mainText" v-html="say"></h1><button class="ui labeled icon primary button"
+				@click="changeSay"><i class="icon sync"></i> Refresh </button><button class="ui labeled icon button"
+				:class="{ red: isStop==0, 'green': isStop == 1 }" @click="stopToggle"><i class="icon"
+					:class="{ pause: isStop==0, 'play': isStop == 1 }"></i><span v-if="isStop == 0">Pause</span><span
+					v-else>Play</span></button>
+			<div class="ui divider"></div>
+			<div class="ui statistic">
+				<div class="value"> {{ delayCounter|timize }} </div>
+				<div class="label"> s Refresh </div>
+			</div>
+		</div>
+		<div class='ui tab' data-tab='Overview'>
+			<div v-for="k in classInfo" v-if="k.classId == classId">
+				<h2>Class {{ k.classId }}</h2>
+				<h3>Head Teacher</h3> {{ k.headTeacher }} <h3>Students list</h3>
+				<table class="ui table">
+					<thead>
+						<tr>
+							<th>Student ID</th>
+							<th>Name</th>
+							<th>Sex</th>
+							<th>Selected Subjects</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="acl in classmates" v-bind:key="acl.id" v-if="acl.class == classId">
+							<td> {{ acl.id }} </td>
+							<td> {{ acl.name }} </td>
+							<td><span v-if="acl.sex == 0"> Male </span><span v-else> Female </span></td>
+							<td> {{ acl.select }} </td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='Settings'>
+			<div class="ui form">
+				<div class="field"><label>Kind Word</label>
+					<div class="ui left icon input"><input type="text" placeholder="Kind Word" v-model="word"
+							@change="changeSay"><i class="pencil alternate icon"></i></div>
+				</div> Grammar：Use<code>{</code><code>{</code><code>}</code><code>}</code> to quote variables，`me` means
+				me and `you` means you <div class="field"><label>Time Interval</label>
+					<div class="ui left icon input"><input type="text" placeholder="Time Interval"
+							v-model="delayTimer"><i class="clock icon"></i></div>
+				</div>
+				<div class="ui grid">
+					<div class="six wide column">
+						<div class="field"><label>“Me” Class(use comma to split)</label><input type="text"
+								v-model="meClasses" @change='doMeParse()'></div>
+						<div class="field"><label>“Me” Selected Subjects</label><input type="text" maxlength="3"
+								v-model="meSelects" @change='doMeParse()'></div>
+					</div>
+					<div class="ten wide column"><span v-for="a in meRange">{{ a.name }},</span></div>
+				</div>
+				<div class="ui grid">
+					<div class="six wide column">
+						<div class="field"><label>“You” Class(use comma to split)</label><input type="text"
+								v-model="youClasses" @change='doYouParse()'></div>
+						<div class="field"><label>“You” Selected Subjects</label><input type="text" v-model="youSelects"
+								@change='doYouParse()'></div>
+					</div>
+					<div class="ten wide column"><span v-for="a in youRange">{{ a.name }},</span></div>
+				</div>
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='Preferences'>
+			<div class="ui form">
+				<div class="field"><label>Text Style</label><textarea class="editor2" v-model="mainTextStyle"
+						@change="changeStyle"></textarea></div>
+				<div class="field"><label>Animation</label><select class="ui search selection dropdown animate"
+						v-model="animationSelect">
+						<option v-for="animation in animationSelects" :value="animation">{{ animation }}</option>
+					</select></div> When `Time Interval` &lt;1s, there will be no animations.
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='Timer'>
+			<div class='orzptl'>{{ nowTime }}</div>
+			<h3 class='ui horizontal left aligned divider header'><i class="icon calendar"></i> Calendar </h3> Today: {{
+			moment().format('YYYY-MM-DD') }} <div class="ui calendar" id="inline_calendar"></div>
+			<h3 class='ui horizontal left aligned divider header'><i class="icon clock"></i> Clock </h3>
+			<h1 class="ui header mainText">{{ moment().format('HH:mm:ss') }}</h1>
+			<h3 class='ui horizontal left aligned divider header'><i class="icon hourglass"></i> Hourglass </h3>
+		</div>
+		<div class='ui bottom attached tab' data-tab='AdvancedSettings'>
+			<div class="ui form">
+				<div class="ui grid">
+					<div class="six wide column">
+						<div class="field"><label>The select range of `me`</label><textarea class="editor"
+								v-model="randomCondition1" @change="calcRange"></textarea></div>
+					</div>
+					<div class="ten wide column"><span v-for="a in meRange">{{ a.name }},</span></div>
+				</div>
+				<div class="ui grid">
+					<div class="six wide column">
+						<div class="field"><label>The select range of `you`</label><textarea class="editor"
+								v-model="randomCondition2" @change="calcRange"></textarea></div>
+					</div>
+					<div class="ten wide column"><span v-for="a in youRange">{{ a.name }},</span></div>
+				</div>
+				<div class="ui divider"></div> Grammar：Please use JavaScript Expressions。<br>
+				<table class="ui table">
+					<thead>
+						<tr>
+							<th>Variables</th>
+							<th>Meanings</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td> Sex </td>
+							<td> Sex：0 means male，1 means female </td>
+						</tr>
+						<tr>
+							<td> Name </td>
+							<td> Student's Name </td>
+						</tr>
+						<tr>
+							<td> Class </td>
+							<td> Class </td>
+						</tr>
+						<tr>
+							<td> Select </td>
+							<td> Selected Subjects </td>
+						</tr>
+						<tr>
+							<td> Id </td>
+							<td> Student ID </td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="field"><label>Raw Data</label><textarea rows="5" id="rawData" readonly></textarea></div>
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='Terminal'>
+			<div class="ui form">
+				<div class="field">
+					<div id="mainbox_ijcwindow" style="height: 300px; overflow: auto;font-family: consolas;">
+						<div id="history_ijcwindow"></div>
+						<font color=#2185d0>&gt;</font><input type="text" id="code_ijcwindow"
+							style="width: 95%;font-family: consolas;"></input>
+					</div>
+				</div>
+				<div class="field"></div>
+			</div>
+		</div>
+		<div class="ui divider"></div> By yemaster. Version v2.0.7.
+	</div>
+	<script src='./main.js'></script>
+</body>
+
+</html>

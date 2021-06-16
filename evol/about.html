@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='UTF-8'>
+	<title>evol</title>
+	<link rel='stylesheet' href='./semantic.min.css'>
+	<script src='./vue.min.js'></script>
+	<script src='./jquery.min.js'></script>
+	<script src='./semantic.min.js'></script>
+	<style>
+		.mainTab {
+			text-align: center;
+		}
+
+		.field.customizeRangeField {
+			display: none;
+		}
+
+		body {
+			transition: all 0.5s;
+			overflow: auto;
+		}
+
+		::-webkit-scrollbar {
+			width: 5px;
+		}
+
+		::-webkit-scrollbar-thumb {
+			border-radius: 10px;
+			-webkit-box-shadow: inset 0 0 5px #bebebe;
+			background: #bebebe;
+			transition: all 0.5s;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			border-radius: 10px;
+			-webkit-box-shadow: inset 0 0 5px #aaaaaa;
+			background: #aaaaaa;
+		}
+
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 5px #e0e0e0;
+			border-radius: 0;
+			background: #e0e0e0;
+			opacity: 1;
+		}
+
+		#totop {
+			position: fixed;
+			bottom: 100px;
+			right: 0;
+			z-index: 114514;
+		}
+	</style>
+</head>
+
+<body>
+	<div id='app' class='ui container'>
+		<h2>关于VegeTable随机抽人</h2>
+		By yemaster.
+		<h4 class="ui horizontal left aligned divider header">
+			<i class="clipboard list icon"></i>
+			更新日志
+		</h4>
+		<div class="ui styled accordion">
+			<div v-for='(ul,i) in rupdateLogs'>
+				<div class="title" :class="{ active: i==0 }">
+					<i class="dropdown icon"></i>
+					{{ ul.ver }}
+				</div>
+				<div class="content" :class="{ active: i==0 }">
+					<ul class="ui list">
+						<li v-for="g in ul.details">{{ g }}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script>
+		let scrollDelay
+		function pageScroll() {
+			window.scrollBy(0, -50)
+			scrollDelay = setTimeout(pageScroll, 10)
+			if ($(window).scrollTop() <= 10) {
+				clearTimeout(scrollDelay)
+			}
+		}
+		$(document).ready(function () {
+			$('#totop').click(pageScroll)
+		})
+
+		let evol = new Vue({
+			el: '#app',
+			data: {
+				updateLogs: [
+					{
+						ver: 'v0.0.1',
+						details: [
+							'多句话轮播'
+						]
+					},
+					{
+						ver: 'v0.0.2',
+						details: [
+							'可以修改名字',
+							'可以修改颜色',
+							'可以修改间隔',
+							'改善了部分ui'
+						]
+					},
+					{
+						ver: 'v0.1.0',
+						details: [
+							'导入了全班名字，随机选取名字',
+							'可以修改文字内容'
+						]
+					},
+					{
+						ver: 'v0.1.1',
+						details: [
+							'增加了随机的范围',
+							'强制自定义的文字友好'
+						]
+					},
+					{
+						ver: 'v0.1.2',
+						details: [
+							'增加自定义范围',
+							'使抽取范围更加人性化'
+						]
+					},
+					{
+						ver: 'v0.1.3',
+						details: [
+							'移除了人性化的设置'
+						]
+					},
+					{
+						ver: 'v1.0.0',
+						details: [
+							'使用vue和semantic-ui重写了全部功能和ui',
+							'允许使用css来修改界面'
+						]
+					},
+					{
+						ver: 'v1.0.1',
+						details: [
+							'替换为fomantic.ui',
+							'丰富了过渡动画',
+							'给随机的人添加class使可以单独修改样式',
+							'增加错误提示'
+						]
+					},
+					{
+						ver: 'v2.0.0',
+						details: [
+							'使用pyqt编写，解决了全屏放映时打开麻烦的麻烦',
+							'ui部分借鉴了element.ui'
+						]
+					},
+					{
+						ver: 'v2.0.1',
+						details: [
+							'修改了部分ui'
+						]
+					}, {
+						ver: 'v2.0.2',
+						details: [
+							'使用pyqtwebengine，使用以前的ui'
+						]
+					}, {
+						ver: 'v2.0.3',
+						details: [
+							'导入1~12班姓名及选课',
+							'配置文件可以自定义班级',
+							'增添了部分bug'
+						]
+					}, {
+						ver: 'v2.0.4',
+						details: [
+							'增加了班级概况'
+						]
+					}, {
+						ver: 'v2.0.5',
+						details: [
+							'增加了更新日志',
+							'解决了时间延迟的问题',
+							'新增了多种动画过渡效果',
+							'修改了部分ui'
+						]
+					}, {
+						ver: 'v2.0.6(最终版)',
+						details: [
+							'修改了部分ui'
+						]
+					}, {
+						ver: 'v2.0.6(最终版)',
+						details: [
+							'修改了部分ui',
+							'新增了Advanced Settings',
+							'新增Console用于debug'
+						]
+					}
+				]
+			},
+			computed: {
+				rupdateLogs: function () {
+					return this.updateLogs.reverse()
+				}
+			}
+		})
+		$('.ui.accordion')
+			.accordion()
+			;
+	</script>
+</body>
+
+</html>
