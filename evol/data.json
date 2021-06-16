@@ -1,0 +1,22 @@
+{
+    "word": "{{ me }}!",
+    "delayTime": "0",
+    "class": 4,
+    "availableClasses": [
+        4
+    ],
+    "classData": [
+        {
+            "classId": 4,
+            "headTeacher": "班主任",
+            "classMates": [
+                {
+                    "id": 1,
+                    "name": "学生",
+                    "sex": 0,
+                    "select": "物化生"
+                }
+            ]
+        }
+    ]
+}
