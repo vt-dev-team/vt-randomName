@@ -14,8 +14,8 @@ QPushButton {
 
 QPushButton#bluebutton {
     color: #fff;
-    background-color: #ec7259;
-    border-color: #ec7259;
+    background-color: #2185d0;
+    border-color: #2185d0;
 }
 
 QPushButton#orangebutton {
@@ -30,8 +30,8 @@ QPushButton:hover {
 }
 
 QPushButton#bluebutton:hover {
-    background: #fc8269;
-    border-color: #fc8269;
+    background: #0d71bb;
+    border-color: #0d71bb;
     color: #fff;
 }
 

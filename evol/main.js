@@ -20,6 +20,23 @@ let evol = new Vue({
     data: {
         peel: Math.floor(Math.random() * 2147483647),
         word: '等待开始',
+        languages: [{
+            id: 0,
+            n: 'English',
+            k: 'en'
+        }, {
+            id: 1,
+            n: '中文（简体）',
+            k: 'zh-CN'
+        }, {
+            id: 2,
+            n: '中文（繁体）',
+            k: 'zh-TW'
+        }],
+        tranFrom: '',
+        tranTo: '',
+        fromLang: 'auto',
+        toLang: 'en',
         classInfo: [],
         availableClasses: [],
         animationSelects: ['none', 'scale', 'zoom', 'fade', 'fade up', 'fade down', 'fade left', 'fade right', 'horizontal flip', 'vertical flip', 'drop', 'fly up', 'fly down', 'fly left', 'fly right', 'swing left', 'swing right', 'swing up', 'swing down', 'slide left', 'slide right', 'slide up', 'slide down', 'browse', 'browse left', 'browse right', 'jiggle', 'flash', 'shake', 'pulse', 'tada', 'bounce'],
@@ -41,13 +58,16 @@ let evol = new Vue({
         meClasses: '',
         meSelects: '',
         youClasses: '',
-        youSelects: ''
+        youSelects: '',
+        serverStatus: 0,
+        tranOK: 1
     },
     mounted() {
         let _this = this
         _this.nowTimer = setInterval(function () {
             _this.nowTime = moment().format('HH:mm:ss')
         }, 1000)
+        _this.testServer()
     },
     beforeDestroy() {
         clearInterval(this.timer)
@@ -56,6 +76,45 @@ let evol = new Vue({
     methods: {
         rand() {
             return this.peel = (214013 * this.peel + 2531011) % 2147483647
+        },
+        testServer() {
+            axios({
+                url: 'http://192.68.4.188:8000'
+            }).then((response) => {
+                this.serverStatus = 1
+            })
+        },
+        tranit() {
+            this.tranOK = 0
+            axios({
+                url: 'http://192.68.4.188:8000/translate', 
+                params: {
+                words: this.tranFrom,
+                fromLang: this.fromLang,
+                toLang: this.toLang
+            }}).then((response) => {
+                this.tranTo = ''
+                for (let i = 0; i < response.data.sentences.length; ++i)
+                    this.tranTo += response.data.sentences[i].trans + '\n'
+                this.tranOK = 1
+            })
+                .catch(function (error) {
+                    if (error.response) {
+                        // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+                        this.tranTo = error.response.data;
+                        this.tranTo += error.response.status;
+                        this.tranTo += error.response.headers;
+                    } else if (error.request) {
+                        // 请求已经成功发起，但没有收到响应
+                        // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+                        // 而在node.js中是 http.ClientRequest 的实例
+                        this.tranTo = error.request;
+                    } else {
+                        // 发送请求时出了点问题
+                        this.tranTo = 'Error', error.message;
+                    }
+                    this.tranTo += error.config;
+                })
         },
         stopToggle() {
             this.isStop = 1 - this.isStop
@@ -237,7 +296,7 @@ let evol = new Vue({
         }
     }
 })
-$('.menu .item')
+$('.tabButton, .menu .item')
     .tab()
     ;
 $('#inline_calendar')
@@ -268,13 +327,18 @@ function getData(data) {
     evol.meClassRange = [4]
     evol.availableClasses = data.availableClasses
     evol.calcRange()
-    for (let i = 0; i < evol.classmates.length; ++i) {
-        $('.ui.dropdown.customizeRange1').append($("<option></option>").val(evol.classmates[i].name).text(evol.classmates[i].class + "班" + evol.classmates[i].name))
-        $('.ui.dropdown.customizeRange2').append($("<option></option>").val(evol.classmates[i].name).text(evol.classmates[i].class + "班" + evol.classmates[i].name))
-    }
     setTimeout(() => {
         $('select.ui.dropdown')
             .dropdown()
             ;
     }, 10)
 }
+
+$('.message .close')
+    .on('click', function () {
+        $(this)
+            .closest('.message')
+            .transition('fade')
+            ;
+    })
+    ;

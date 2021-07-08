@@ -10,6 +10,7 @@
 	<script src='./semantic.min.js'></script>
 	<script src='./moment.js'></script>
 	<script src='./ijc.js'></script>
+	<script src='./axios.min.js'></script>
 	<style type="text/css" id="customizeStyle">
 		#app {
 			opacity: .7;
@@ -110,12 +111,15 @@
 
 <body>
 	<div class="ui light big launch right attached fixed button" id="totop"><i class="angle up icon"></i></div>
-	<div class='ui left fixed vertical labeled icon mini borderless menu vmenu'><a class='item' data-tab='Overview'><i
-				class='icon info'></i> Overview </a><a class='active item' data-tab='Show'><i class='icon tv'></i> Show
+	<div class='ui left fixed vertical labeled icon mini borderless menu vmenu'>
+		<a class='item' data-tab='Overview'><i class='icon info'></i> Overview </a><a class='active item'
+			data-tab='Show'><i class='icon tv'></i> Show
 		</a><a class='item' data-tab='Settings'><i class='icon cog'></i> Settings </a><a class='item'
-			data-tab='Preferences'><i class='icon paint roller'></i> Preferences </a><a class="item" data-tab='Timer'><i
-				class='icon clock'></i> Time </a><a class='item' data-tab='AdvancedSettings'><i class="hammer icon"></i>
-			Advanced </a><a class='item' data-tab='Terminal'><i class="terminal icon"></i> Console </a></div>
+			data-tab='Preferences'><i class='icon paint roller'></i> Preferences </a><a class='item'
+			data-tab='AdvancedSettings'><i class="hammer icon"></i>
+			Advanced </a>
+		<a class='item' data-tab='MoreTools'><i class="wrench icon"></i> Tools </a>
+	</div>
 	<div id="app" style="margin-top: 30px">
 		<div class='ui bottom attached active tab mainTab' data-tab='Show'>
 			<h1 class="ui header mainText" v-html="say"></h1><button class="ui labeled icon primary button"
@@ -130,6 +134,7 @@
 			</div>
 		</div>
 		<div class='ui tab' data-tab='Overview'>
+			<h2>Overview</h2>
 			<div v-for="k in classInfo" v-if="k.classId == classId">
 				<h2>Class {{ k.classId }}</h2>
 				<h3>Head Teacher</h3> {{ k.headTeacher }} <h3>Students list</h3>
@@ -154,6 +159,7 @@
 			</div>
 		</div>
 		<div class='ui bottom attached tab' data-tab='Settings'>
+			<h2>Settings</h2>
 			<div class="ui form">
 				<div class="field"><label>Kind Word</label>
 					<div class="ui left icon input"><input type="text" placeholder="Kind Word" v-model="word"
@@ -261,6 +267,109 @@
 					</div>
 				</div>
 				<div class="field"></div>
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='Translate'>
+			<h2>Google翻译
+				<div class="ui green label" v-if='serverStatus'>
+					<i class="checkmark icon"></i>
+					连接成功
+				</div>
+				<div class="ui red label" v-else>
+					<i class="x icon"></i>
+					连接失败
+				</div>
+			</h2>
+			<div class="ui form">
+				<div class="ui grid">
+					<div class="eight wide column">
+						<div class="field">
+							<label>语言</label>
+							<select class="ui selection dropdown" v-model="fromLang">
+								<option value="auto">自动检测</option>
+							</select>
+						</div>
+						<div class="field">
+							<label>原文</label>
+							<textarea rows=10 v-model="tranFrom" @change="tranit()"></textarea>
+						</div>
+						<button class="ui primary button" :class='{ loading: !tranOK }' @click="tranit()">翻译</button>
+					</div>
+					<div class="eight wide column">
+						<div class="field">
+							<label>语言</label>
+							<select class="ui selection dropdown" v-model="toLang">
+								<option v-for="l in languages" :value="l.k">{{ l.n }}</option>
+							</select>
+						</div>
+						<div class="field">
+							<label>译文</label>
+							<textarea rows=10 v-model="tranTo" readonly></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="ui divider"></div>
+				Powered by Google Translation API.
+			</div>
+		</div>
+		<div class='ui bottom attached tab' data-tab='MoreTools'>
+			<h2>更多工具</h2>
+			<div class="ui card">
+				<div class="content">
+					<div class="header">时钟</div>
+				</div>
+				<div class="content">
+					<div class="ui small feed">
+						<div class="event">
+							<div class="content">
+								<div class="summary">
+									用于查看日期和时间
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="extra content">
+					<a data-tab='Timer' class="tabButton ui basic primary button">整一个</a>
+				</div>
+			</div>
+			<div class="ui card">
+				<div class="content">
+					<div class="header">JavaScript控制台</div>
+				</div>
+				<div class="content">
+					<div class="ui small feed">
+						<div class="event">
+							<div class="content">
+								<div class="summary">
+									简易JavaScript控制台
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="extra content">
+					<a data-tab='Terminal' class="tabButton ui basic primary button">整一个</a>
+				</div>
+			</div>
+			<div class="ui card">
+				<div class="content">
+					<div class="header">Google翻译</div>
+				</div>
+				<div class="content">
+					<div class="ui small feed">
+						<div class="event">
+							<div class="content">
+								<div class="summary">
+									应用Google翻译的api，需要干一些事情后才能用
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="extra content">
+					<a data-tab='Translate' class="tabButton ui basic primary button">整一个</a>
+				</div>
 			</div>
 		</div>
 		<div class="ui divider"></div> By yemaster. Version v2.0.7.
